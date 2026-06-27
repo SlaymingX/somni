@@ -352,6 +352,55 @@ img{display:block;max-width:100%}
 .sort-item:hover{background:var(--bg-panel);color:var(--lavender)}
 .sort-item.active{color:var(--lavender)}
 .sort-item svg{width:14px;height:14px;opacity:0.7}
+/* ── CHARACTERS LIST VIEW ── */
+#chars-view{padding-bottom:80px}
+.chars-view-header{padding:20px 20px 16px;display:flex;align-items:center;justify-content:space-between}
+.chars-view-title{font-family:var(--font-display);font-size:1.5rem;color:var(--cream)}
+.chars-view-count{font-size:0.8rem;color:var(--text-muted);background:var(--bg-panel);padding:4px 10px;border-radius:20px}
+.chars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 12px}
+@media(min-width:480px){.chars-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.chars-grid{grid-template-columns:repeat(4,1fr)}}
+.char-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition);box-shadow:var(--shadow-card);display:flex;flex-direction:column;align-items:center;padding:20px 12px 16px;gap:10px;text-align:center}
+.char-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-card),0 0 40px rgba(107,140,199,0.15);border-color:var(--border-act)}
+.char-card-avatar{width:72px;height:72px;border-radius:50%;background:var(--bg-panel);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;flex-shrink:0}
+.char-card-avatar img{width:100%;height:100%;object-fit:cover}
+.char-card-name{font-family:var(--font-display);font-size:0.95rem;color:var(--cream);line-height:1.3}
+.char-card-role{font-size:0.72rem;color:var(--text-muted)}
+.char-card-dreams{font-size:0.7rem;color:var(--mist);background:rgba(107,140,199,0.1);border:1px solid rgba(107,140,199,0.2);border-radius:20px;padding:3px 10px}
+/* ── CHARACTER PROFILE VIEW ── */
+#char-profile-view{padding-bottom:80px;flex:1}
+.char-profile-cover{position:relative;width:100%;aspect-ratio:16/7;min-height:180px;max-height:280px;overflow:hidden;background:var(--bg-panel)}
+.char-profile-cover img{width:100%;height:100%;object-fit:cover}
+.char-profile-cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1A1530,#0D1A2E,#1A0D2E);font-size:5rem;opacity:0.4}
+.char-profile-cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(13,11,26,0.95) 100%)}
+.char-profile-cover-edit{position:absolute;top:12px;right:12px;background:rgba(13,11,26,0.7);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--lavender);padding:6px 12px;font-size:0.75rem;cursor:pointer;opacity:0;transition:opacity var(--transition)}
+.char-profile-cover:hover .char-profile-cover-edit{opacity:1}
+.char-profile-identity{display:flex;align-items:flex-end;gap:16px;padding:0 20px;margin-top:-36px;position:relative;z-index:2}
+.char-profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--bg-panel);border:3px solid var(--bg-deep);display:flex;align-items:center;justify-content:center;font-size:2.5rem;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color var(--transition);box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.char-profile-avatar:hover{border-color:var(--lavender)}
+.char-profile-avatar img{width:100%;height:100%;object-fit:cover}
+.char-profile-name-block{flex:1;padding-bottom:6px}
+.char-profile-name{font-family:var(--font-display);font-size:1.4rem;color:var(--cream);line-height:1.2}
+.char-profile-role{font-size:0.82rem;color:var(--text-muted);margin-top:3px}
+.char-profile-body{padding:16px 20px}
+.char-profile-desc{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);font-size:0.9rem;line-height:1.7;padding:12px;outline:none;resize:none;width:100%;min-height:90px;transition:border-color var(--transition)}
+.char-profile-desc:focus{border-color:var(--border-act)}
+.char-profile-desc::placeholder{color:var(--text-muted);font-style:italic}
+.char-profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.char-stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 8px;text-align:center}
+.char-stat-val{font-family:var(--font-display);font-size:1.5rem;color:var(--lavender);line-height:1}
+.char-stat-lbl{font-size:0.65rem;color:var(--text-muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.07em}
+.char-profile-moods{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.char-mood-badge{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:0.78rem}
+.char-dreams-list{display:flex;flex-direction:column;gap:8px}
+.char-dream-row{display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;cursor:pointer;transition:all var(--transition)}
+.char-dream-row:hover{border-color:var(--border-act);background:var(--bg-panel)}
+.char-dream-thumb{width:44px;height:44px;border-radius:var(--radius-sm);background:var(--bg-panel);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.char-dream-thumb img{width:100%;height:100%;object-fit:cover}
+.char-dream-info{flex:1;min-width:0}
+.char-dream-title{font-family:var(--font-display);font-size:0.9rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-dream-meta{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
+.char-dream-role-badge{font-size:0.68rem;padding:3px 8px;border-radius:20px;background:rgba(196,181,232,0.1);border:1px solid rgba(196,181,232,0.2);color:var(--lavender);white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -591,6 +640,88 @@ img{display:block;max-width:100%}
     </div>
   </div>
 
+
+  <!-- ═══ CHARACTERS LIST ═══ -->
+  <div id="chars-view" class="view">
+    <div class="chars-view-header">
+      <div class="chars-view-title">Персонажі</div>
+      <div class="chars-view-count" id="chars-total">0</div>
+    </div>
+    <div class="chars-grid" id="chars-grid"></div>
+    <div class="empty-state hidden" id="chars-empty">
+      <div class="empty-state-icon">👥</div>
+      <div class="empty-state-title">Ще немає персонажів</div>
+      <div class="empty-state-text">Додавай персонажів коли записуєш сон —<br>вони з'являться тут автоматично.</div>
+    </div>
+  </div>
+
+  <!-- ═══ CHARACTER PROFILE ═══ -->
+  <div id="char-profile-view" class="view">
+    <!-- Cover -->
+    <div class="char-profile-cover" id="cp-cover" onclick="triggerCharProfileCover()">
+      <div class="char-profile-cover-placeholder" id="cp-cover-placeholder">👤</div>
+      <img id="cp-cover-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div class="char-profile-cover-overlay"></div>
+      <span class="char-profile-cover-edit">📷 Обкладинка</span>
+    </div>
+    <input type="file" id="cp-cover-input" accept="image/*" style="display:none" onchange="setCharProfileCover(event)">
+
+    <!-- Identity row: avatar + name -->
+    <div class="char-profile-identity">
+      <div class="char-profile-avatar" id="cp-avatar" onclick="triggerCharProfileAvatar()">
+        <span id="cp-avatar-emoji">👤</span>
+        <img id="cp-avatar-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      </div>
+      <div class="char-profile-name-block">
+        <div class="char-profile-name" id="cp-name" contenteditable="true" spellcheck="false"
+          onblur="saveCharProfile()" style="outline:none;min-width:60px"></div>
+        <div class="char-profile-role" id="cp-role" contenteditable="true" spellcheck="false"
+          onblur="saveCharProfile()" style="outline:none;min-width:60px"
+          data-placeholder="Роль у снах…"></div>
+      </div>
+      <div style="display:flex;gap:8px;padding-bottom:6px">
+        <button class="btn-icon" onclick="confirmDeleteChar()" title="Видалити персонажа">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        </button>
+        <button class="topbar-back" onclick="showView('chars')" style="border-radius:50%">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <input type="file" id="cp-avatar-input" accept="image/*" style="display:none" onchange="setCharProfileAvatar(event)">
+
+    <div class="char-profile-body">
+      <!-- Stats row -->
+      <div class="char-profile-stats" id="cp-stats"></div>
+
+      <!-- Mood badges -->
+      <div class="section-divider">Настрої снів</div>
+      <div class="char-profile-moods" id="cp-moods"></div>
+
+      <!-- Description -->
+      <div class="section-divider">Про персонажа</div>
+      <textarea class="char-profile-desc" id="cp-desc"
+        placeholder="Хто цей персонаж? Що ти про нього знаєш?…"
+        onblur="saveCharProfile()" rows="4"></textarea>
+
+      <!-- Dreams list -->
+      <div class="section-divider">Сни з цим персонажем</div>
+      <div class="char-dreams-list" id="cp-dreams"></div>
+    </div>
+  </div>
+
+  <!-- Delete char dialog -->
+  <div class="dialog-overlay hidden" id="char-dialog-overlay">
+    <div class="dialog">
+      <div class="dialog-title">Видалити персонажа?</div>
+      <div class="dialog-body">Персонажа буде видалено зі словника. У снах де він є — інформація залишиться.</div>
+      <div class="dialog-actions">
+        <button class="dialog-btn dialog-btn-cancel" onclick="closeCharDialog()">Скасувати</button>
+        <button class="dialog-btn dialog-btn-delete" onclick="deleteCharProfile()">Видалити</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="showView('home')" id="nav-home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -599,6 +730,10 @@ img{display:block;max-width:100%}
     <button class="nav-btn" onclick="showView('stats')" id="nav-stats">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Аналіз
+    </button>
+    <button class="nav-btn" onclick="showView('chars')" id="nav-chars">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Персонажі
     </button>
     <button class="nav-btn" onclick="showView('settings')" id="nav-settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -861,33 +996,25 @@ async function syncToDrive() {
       if (remote) {
         try {
           const parsed = JSON.parse(remote);
-          // Merge incoming dreams (they may have full photos from Drive)
-          const incoming = parsed.dreams || [];
-          // Before merging, persist incoming photos to separate keys
-          incoming.forEach(d => {
-            if (d.cover || d.photos?.length || d.chars?.some(c => c.photo)) {
-              try {
-                localStorage.setItem('dream_photos_' + d.id, JSON.stringify({
-                  cover: d.cover || null,
-                  photos: d.photos || [],
-                  chars: d.chars || [],
-                }));
-              } catch {}
-            }
-          });
-          dreams = mergeEntries(dreams, incoming);
+          dreams = mergeEntries(dreams, parsed.dreams || []);
           if (parsed.settings) {
-            settings = { ...parsed.settings, ...settings }; // local wins on conflict
+            settings = { ...parsed.settings, ...settings };
             localStorage.setItem('dreamSettings', JSON.stringify(settings));
           }
-          // Restore cover URL from Drive data if local is empty
           if (!coverImage && parsed.coverDataUrl) {
             coverImage = parsed.coverDataUrl;
             localStorage.setItem('dreamCover', coverImage);
             initCover();
           }
+          if (parsed.charDict) {
+            // Merge charDict: local overrides remote for same key
+            charDict = { ...parsed.charDict, ...charDict };
+            saveCharDict();
+          }
           saveDreamsLocal();
-        } catch {}
+        } catch (parseErr) {
+          console.error('Failed to parse remote data:', parseErr);
+        }
       }
     }
 
@@ -898,6 +1025,7 @@ async function syncToDrive() {
       updatedAt: Date.now(),
       dreams: fullDreams,
       settings,
+      charDict,
       coverDataUrl: coverImage || null,
     });
     const newId = await uploadFile(driveFileId, DRIVE_FILE_NAME, payload);
@@ -916,13 +1044,65 @@ async function syncToDrive() {
   }
 }
 
-/** Merge two arrays of dreams by id, latest updatedAt wins */
+/** Merge two arrays of dreams by id.
+ *  Latest updatedAt wins for text/metadata.
+ *  Photos are always taken from whichever version has them,
+ *  with local photos winning if both exist (avoid overwriting
+ *  a just-uploaded photo with a stale remote copy).
+ */
 function mergeEntries(local, remote) {
   const map = {};
-  [...local, ...remote].forEach(d => {
+
+  // Index local first
+  local.forEach(d => { map[d.id] = rehydrateDream(d); });
+
+  // Merge remote: text fields use latest updatedAt, but photos
+  // are preserved from local if local is newer or has photos already.
+  remote.forEach(d => {
     const existing = map[d.id];
-    if (!existing || (d.updatedAt || 0) > (existing.updatedAt || 0)) map[d.id] = d;
+    if (!existing) {
+      // New entry from remote — save its photos locally and add
+      if (d.cover || d.photos?.length || d.chars?.some(c => c.photo)) {
+        try {
+          localStorage.setItem('dream_photos_' + d.id, JSON.stringify({
+            cover: d.cover || null,
+            photos: d.photos || [],
+            chars: d.chars || [],
+          }));
+        } catch {}
+      }
+      map[d.id] = d;
+    } else {
+      // Entry exists locally — pick winner by updatedAt
+      const localNewer = (existing.updatedAt || 0) >= (d.updatedAt || 0);
+      if (localNewer) {
+        // Keep local metadata; but absorb remote photos only if local has none
+        map[d.id] = {
+          ...existing,
+          cover:  existing.cover  || d.cover  || null,
+          photos: existing.photos?.length ? existing.photos : (d.photos || []),
+        };
+      } else {
+        // Remote is newer — use remote metadata but keep local photos if remote lost them
+        const localPhotos = rehydrateDream(existing);
+        const mergedEntry = {
+          ...d,
+          cover:  d.cover  || localPhotos.cover  || null,
+          photos: d.photos?.length ? d.photos : (localPhotos.photos || []),
+        };
+        // Persist remote photos to local store
+        try {
+          localStorage.setItem('dream_photos_' + d.id, JSON.stringify({
+            cover: mergedEntry.cover || null,
+            photos: mergedEntry.photos || [],
+            chars: mergedEntry.chars || [],
+          }));
+        } catch {}
+        map[d.id] = mergedEntry;
+      }
+    }
   });
+
   return Object.values(map);
 }
 
@@ -1008,12 +1188,15 @@ async function init() {
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(name + '-view').classList.add('active');
-  document.getElementById('nav-' + name)?.classList.add('active');
+  // char-profile doesn't have its own nav button — keep chars nav active
+  const navName = name === 'char-profile' ? 'chars' : name;
+  document.getElementById(navName + '-view')?.classList.add('active');
+  document.getElementById('nav-' + navName)?.classList.add('active');
   document.getElementById('fab').style.display = name === 'home' ? 'flex' : 'none';
   if (name === 'home')     renderCards();
   if (name === 'stats')    renderStats();
   if (name === 'settings') renderSettings();
+  if (name === 'chars')    renderCharsList();
 }
 function goBack() { showView('home'); }
 
@@ -1194,8 +1377,8 @@ function deleteDream() {
 //  EDITOR HELPERS
 // ══════════════════════════════════════════════════════════
 // ── IMAGE COMPRESSION ──────────────────────────────────────
-// Resizes to maxW×maxH and compresses to JPEG quality q (0–1).
-// Returns a base64 data URL.
+let _compressing = 0; // counter of in-flight compressions
+
 function compressImage(dataUrl, maxW, maxH, q) {
   return new Promise(resolve => {
     const img = new Image();
@@ -1213,16 +1396,24 @@ function compressImage(dataUrl, maxW, maxH, q) {
 }
 
 function triggerEditorCover() { document.getElementById('editor-cover-input').click(); }
-async function setEditorCover(e) {
+function setEditorCover(e) {
   const file = e.target.files[0]; if (!file) return;
+  // Show a "processing…" overlay while compressing
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '⏳'; btn.disabled = true;
+  _compressing++;
   const reader = new FileReader();
   reader.onload = async ev => {
-    // Cover: max 1200×500, 70% quality (~100–200 KB)
-    const compressed = await compressImage(ev.target.result, 1200, 500, 0.7);
-    currentDream.cover = compressed;
-    const img = document.getElementById('editor-cover-img');
-    img.src = compressed; img.style.display = 'block';
-    document.getElementById('editor-cover-hint').style.display = 'none';
+    try {
+      const compressed = await compressImage(ev.target.result, 1200, 500, 0.7);
+      currentDream.cover = compressed;
+      const img = document.getElementById('editor-cover-img');
+      img.src = compressed; img.style.display = 'block';
+      document.getElementById('editor-cover-hint').style.display = 'none';
+    } finally {
+      _compressing--;
+      if (_compressing <= 0) { _compressing = 0; btn.textContent = 'Зберегти'; btn.disabled = false; }
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -1280,11 +1471,18 @@ function removeChar(i) { currentDream.chars.splice(i,1); renderChars(); }
 function triggerCharPhoto(i) { document.getElementById('char-photo-'+i)?.click(); }
 function setCharPhoto(e,i) {
   const file=e.target.files[0]; if(!file)return;
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '⏳'; btn.disabled = true;
+  _compressing++;
   const reader=new FileReader();
   reader.onload=async ev=>{
-    // Avatar: max 200×200, 75% quality (~10–20 KB)
-    currentDream.chars[i].photo = await compressImage(ev.target.result, 200, 200, 0.75);
-    renderChars();
+    try {
+      currentDream.chars[i].photo = await compressImage(ev.target.result, 200, 200, 0.75);
+      renderChars();
+    } finally {
+      _compressing--;
+      if (_compressing <= 0) { _compressing = 0; btn.textContent = 'Зберегти'; btn.disabled = false; }
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -1299,14 +1497,23 @@ function renderPhotos() {
 }
 function triggerPhotoUpload() { document.getElementById('photo-input').click(); }
 function addPhotos(e) {
-  Array.from(e.target.files).forEach(async file => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '⏳'; btn.disabled = true;
+  _compressing += files.length;
+  files.forEach(file => {
     const reader = new FileReader();
     reader.onload = async ev => {
-      // Gallery photo: max 1200×900, 72% quality (~150–250 KB)
-      const compressed = await compressImage(ev.target.result, 1200, 900, 0.72);
-      if (!currentDream.photos) currentDream.photos = [];
-      currentDream.photos.push(compressed);
-      renderPhotos();
+      try {
+        const compressed = await compressImage(ev.target.result, 1200, 900, 0.72);
+        if (!currentDream.photos) currentDream.photos = [];
+        currentDream.photos.push(compressed);
+        renderPhotos();
+      } finally {
+        _compressing--;
+        if (_compressing <= 0) { _compressing = 0; btn.textContent = 'Зберегти'; btn.disabled = false; }
+      }
     };
     reader.readAsDataURL(file);
   });
@@ -1441,6 +1648,257 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').cat
 initCover();
 renderCards();
 init();
+
+// ══════════════════════════════════════════════════════════
+//  CHARACTER DICTIONARY
+//  Extra per-character data (cover, bio, custom avatar)
+//  not stored in individual dream entries.
+//  Keyed by a canonical name (lowercased, trimmed).
+// ══════════════════════════════════════════════════════════
+
+let charDict = JSON.parse(localStorage.getItem('charDict') || '{}');
+// { "canonical_name": { cover, avatarPhoto, bio, emoji } }
+
+function saveCharDict() {
+  localStorage.setItem('charDict', JSON.stringify(charDict));
+}
+
+/** Build a merged list of all unique characters across all dreams */
+function buildCharIndex() {
+  const map = {}; // canonical → { name, role, emoji, photo, dreams:[] }
+
+  dreams.forEach(dream => {
+    const d = rehydrateDream(dream);
+    (d.chars || []).forEach(c => {
+      if (!c.name?.trim()) return;
+      const key = c.name.trim().toLowerCase();
+      if (!map[key]) {
+        map[key] = {
+          key,
+          name: c.name.trim(),
+          role: c.role || '',
+          emoji: c.emoji || '👤',
+          photo: c.photo || null,
+          dreams: [],
+        };
+      }
+      // Update photo/role if this entry has one and the index doesn't yet
+      if (!map[key].photo && c.photo) map[key].photo = c.photo;
+      if (!map[key].role && c.role) map[key].role = c.role;
+      map[key].dreams.push({ dream: d, role: c.role || '' });
+    });
+  });
+
+  // Merge with charDict overrides (custom cover, bio, avatarPhoto)
+  Object.keys(map).forEach(key => {
+    const extra = charDict[key] || {};
+    map[key] = { ...map[key], ...extra, dreams: map[key].dreams };
+  });
+
+  return map;
+}
+
+// ── CHARACTERS LIST ───────────────────────────────────────
+function renderCharsList() {
+  const grid    = document.getElementById('chars-grid');
+  const empty   = document.getElementById('chars-empty');
+  const total   = document.getElementById('chars-total');
+  const index   = buildCharIndex();
+  const entries = Object.values(index).sort((a,b) => b.dreams.length - a.dreams.length);
+
+  total.textContent = entries.length + ' ' + pluralUk(entries.length, 'персонаж', 'персонажі', 'персонажів');
+
+  if (!entries.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  grid.innerHTML = entries.map(ch => {
+    const n = ch.dreams.length;
+    const avatarHtml = (ch.avatarPhoto || ch.photo)
+      ? `<img src="${ch.avatarPhoto || ch.photo}" alt="">`
+      : (ch.emoji || '👤');
+    return `
+    <div class="char-card" onclick="openCharProfile('${escStr(ch.key)}')">
+      <div class="char-card-avatar">${avatarHtml}</div>
+      <div class="char-card-name">${escStr(ch.name)}</div>
+      ${ch.role ? `<div class="char-card-role">${escStr(ch.role)}</div>` : ''}
+      <div class="char-card-dreams">${n} ${pluralUk(n,'сон','сни','снів')}</div>
+    </div>`;
+  }).join('');
+}
+
+function pluralUk(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return few;
+  return many;
+}
+function escStr(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── CHARACTER PROFILE ─────────────────────────────────────
+let currentCharKey = null;
+
+function openCharProfile(key) {
+  currentCharKey = key;
+  const index = buildCharIndex();
+  const ch    = index[key];
+  if (!ch) return;
+
+  // Cover
+  const coverImg  = document.getElementById('cp-cover-img');
+  const coverPh   = document.getElementById('cp-cover-placeholder');
+  if (ch.cover) {
+    coverImg.src = ch.cover; coverImg.style.display = 'block';
+    coverPh.style.display = 'none';
+  } else {
+    coverImg.style.display = 'none';
+    coverPh.style.display  = 'flex';
+    coverPh.textContent    = ch.emoji || '👤';
+  }
+
+  // Avatar
+  const avImg   = document.getElementById('cp-avatar-img');
+  const avEmoji = document.getElementById('cp-avatar-emoji');
+  if (ch.avatarPhoto || ch.photo) {
+    avImg.src = ch.avatarPhoto || ch.photo;
+    avImg.style.display  = 'block';
+    avEmoji.style.display = 'none';
+  } else {
+    avImg.style.display   = 'none';
+    avEmoji.style.display = 'inline';
+    avEmoji.textContent   = ch.emoji || '👤';
+  }
+
+  // Name & role
+  document.getElementById('cp-name').textContent = ch.name;
+  document.getElementById('cp-role').textContent = ch.role || '';
+
+  // Bio
+  document.getElementById('cp-desc').value = ch.bio || '';
+
+  // Stats
+  const moods = {};
+  ch.dreams.forEach(({ dream }) => { if (dream.mood) moods[dream.mood] = (moods[dream.mood]||0)+1; });
+  const firstDate = ch.dreams.map(x=>x.dream.date).filter(Boolean).sort()[0];
+  const lastDate  = ch.dreams.map(x=>x.dream.date).filter(Boolean).sort().at(-1);
+  const fmtDate = d => d ? new Date(d+'T12:00').toLocaleDateString('uk-UA',{day:'numeric',month:'short'}) : '—';
+
+  document.getElementById('cp-stats').innerHTML = `
+    <div class="char-stat-card">
+      <div class="char-stat-val">${ch.dreams.length}</div>
+      <div class="char-stat-lbl">Снів</div>
+    </div>
+    <div class="char-stat-card">
+      <div class="char-stat-val">${fmtDate(firstDate)}</div>
+      <div class="char-stat-lbl">Перший раз</div>
+    </div>
+    <div class="char-stat-card">
+      <div class="char-stat-val">${fmtDate(lastDate)}</div>
+      <div class="char-stat-lbl">Останній раз</div>
+    </div>`;
+
+  // Mood badges
+  document.getElementById('cp-moods').innerHTML = Object.entries(moods)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([m,c]) => `
+      <div class="char-mood-badge" style="background:${MOOD_COLORS[m]}22;border:1px solid ${MOOD_COLORS[m]}44;color:${MOOD_COLORS[m]}">
+        ${MOOD_EMOJIS[m]} ${MOOD_LABELS[m]} · ${c}
+      </div>`)
+    .join('') || '<span style="color:var(--text-muted);font-size:0.82rem">Немає даних</span>';
+
+  // Dreams list
+  document.getElementById('cp-dreams').innerHTML = ch.dreams
+    .sort((a,b) => (b.dream.date||'').localeCompare(a.dream.date||''))
+    .map(({ dream: d, role }) => {
+      const thumb = d.cover || d.photos?.[0] || '';
+      const dateStr = d.date ? new Date(d.date+'T12:00').toLocaleDateString('uk-UA',{day:'numeric',month:'long'}) : '';
+      return `
+      <div class="char-dream-row" onclick="editDream('${d.id}')">
+        <div class="char-dream-thumb">
+          ${thumb ? `<img src="${thumb}" alt="">` : (d.emoji||'🌙')}
+        </div>
+        <div class="char-dream-info">
+          <div class="char-dream-title">${escStr(d.title||'Без назви')}</div>
+          <div class="char-dream-meta">${dateStr}${d.mood?' · '+MOOD_EMOJIS[d.mood]:''}</div>
+        </div>
+        ${role ? `<div class="char-dream-role-badge">${escStr(role)}</div>` : ''}
+      </div>`;
+    }).join('');
+
+  // Show the profile view (push it on top without changing the nav tab)
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('char-profile-view').classList.add('active');
+  document.getElementById('fab').style.display = 'none';
+}
+
+function saveCharProfile() {
+  if (!currentCharKey) return;
+  const name = document.getElementById('cp-name').textContent.trim();
+  const role = document.getElementById('cp-role').textContent.trim();
+  const bio  = document.getElementById('cp-desc').value;
+  if (!charDict[currentCharKey]) charDict[currentCharKey] = {};
+  charDict[currentCharKey].bio  = bio;
+  charDict[currentCharKey].name = name || undefined;
+  charDict[currentCharKey].role = role || undefined;
+  saveCharDict();
+}
+
+// Cover upload
+function triggerCharProfileCover() { document.getElementById('cp-cover-input').click(); }
+function setCharProfileCover(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    const compressed = await compressImage(ev.target.result, 1200, 500, 0.7);
+    if (!charDict[currentCharKey]) charDict[currentCharKey] = {};
+    charDict[currentCharKey].cover = compressed;
+    saveCharDict();
+    const img = document.getElementById('cp-cover-img');
+    img.src = compressed; img.style.display = 'block';
+    document.getElementById('cp-cover-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Avatar upload
+function triggerCharProfileAvatar() { document.getElementById('cp-avatar-input').click(); }
+function setCharProfileAvatar(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    const compressed = await compressImage(ev.target.result, 400, 400, 0.8);
+    if (!charDict[currentCharKey]) charDict[currentCharKey] = {};
+    charDict[currentCharKey].avatarPhoto = compressed;
+    saveCharDict();
+    const img = document.getElementById('cp-avatar-img');
+    img.src = compressed; img.style.display = 'block';
+    document.getElementById('cp-avatar-emoji').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Delete char from dictionary (doesn't touch dream entries)
+function confirmDeleteChar() {
+  document.getElementById('char-dialog-overlay').classList.remove('hidden');
+}
+function closeCharDialog() {
+  document.getElementById('char-dialog-overlay').classList.add('hidden');
+}
+function deleteCharProfile() {
+  if (currentCharKey && charDict[currentCharKey]) {
+    delete charDict[currentCharKey];
+    saveCharDict();
+  }
+  closeCharDialog();
+  showView('chars');
+  showToast('🗑 Словник персонажа очищено');
+}
+
 </script>
 </body>
 </html>
