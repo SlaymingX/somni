@@ -861,7 +861,21 @@ async function syncToDrive() {
       if (remote) {
         try {
           const parsed = JSON.parse(remote);
-          dreams = mergeEntries(dreams, parsed.dreams || []);
+          // Merge incoming dreams (they may have full photos from Drive)
+          const incoming = parsed.dreams || [];
+          // Before merging, persist incoming photos to separate keys
+          incoming.forEach(d => {
+            if (d.cover || d.photos?.length || d.chars?.some(c => c.photo)) {
+              try {
+                localStorage.setItem('dream_photos_' + d.id, JSON.stringify({
+                  cover: d.cover || null,
+                  photos: d.photos || [],
+                  chars: d.chars || [],
+                }));
+              } catch {}
+            }
+          });
+          dreams = mergeEntries(dreams, incoming);
           if (parsed.settings) {
             settings = { ...parsed.settings, ...settings }; // local wins on conflict
             localStorage.setItem('dreamSettings', JSON.stringify(settings));
@@ -877,11 +891,12 @@ async function syncToDrive() {
       }
     }
 
-    // --- Upload merged data ---
+    // --- Upload merged data (rehydrate photos from separate localStorage keys) ---
+    const fullDreams = dreams.map(d => rehydrateDream(d));
     const payload = JSON.stringify({
       version: 2,
       updatedAt: Date.now(),
-      dreams,
+      dreams: fullDreams,
       settings,
       coverDataUrl: coverImage || null,
     });
@@ -912,7 +927,46 @@ function mergeEntries(local, remote) {
 }
 
 function saveDreamsLocal() {
-  localStorage.setItem('dreams', JSON.stringify(dreams));
+  try {
+    // Strip large base64 blobs from the main array before storing.
+    // Photos live in separate localStorage keys: dream_photos_<id>
+    // This keeps the main 'dreams' key small (~few KB per entry).
+    const slim = dreams.map(d => {
+      const { cover, photos, chars, ...rest } = d;
+      // Store photos separately
+      const photoKey = 'dream_photos_' + d.id;
+      const photoData = { cover: cover || null, photos: photos || [], chars: chars || [] };
+      try {
+        localStorage.setItem(photoKey, JSON.stringify(photoData));
+      } catch (qe) {
+        console.warn('Could not store photos for', d.id, qe);
+      }
+      // Keep chars without photos in the slim copy (for search/display)
+      const slimChars = (chars || []).map(({ photo, ...c }) => c);
+      return { ...rest, chars: slimChars, hasPhotos: !!(cover || photos?.length) };
+    });
+    localStorage.setItem('dreams', JSON.stringify(slim));
+  } catch (e) {
+    console.error('saveDreamsLocal failed:', e);
+    showToast('⚠️ Мало місця в браузері — спробуй видалити старі фото');
+  }
+}
+
+// Rehydrate a dream entry with its photos from separate storage
+function rehydrateDream(d) {
+  const photoKey = 'dream_photos_' + d.id;
+  try {
+    const raw = localStorage.getItem(photoKey);
+    if (raw) {
+      const { cover, photos, chars } = JSON.parse(raw);
+      // Merge chars: slim (from main) + photo (from photo store)
+      const mergedChars = (d.chars || []).map((c, i) => ({
+        ...c, photo: chars?.[i]?.photo || null
+      }));
+      return { ...d, cover, photos, chars: mergedChars };
+    }
+  } catch {}
+  return d;
 }
 
 async function manualSync() {
@@ -1084,7 +1138,7 @@ function newDream() {
 function editDream(id) {
   const d = dreams.find(x => x.id === id);
   if (!d) return;
-  currentDream = JSON.parse(JSON.stringify(d));
+  currentDream = JSON.parse(JSON.stringify(rehydrateDream(d)));
   openEditor();
 }
 function openEditor() {
@@ -1128,6 +1182,8 @@ function saveDream() {
 function confirmDelete() { document.getElementById('dialog-overlay').classList.remove('hidden'); }
 function closeDialog()   { document.getElementById('dialog-overlay').classList.add('hidden'); }
 function deleteDream() {
+  // Also remove the separate photo storage for this dream
+  try { localStorage.removeItem('dream_photos_' + currentDream.id); } catch {}
   dreams = dreams.filter(d => d.id !== currentDream.id);
   saveDreamsLocal(); closeDialog();
   syncToDrive();
@@ -1137,14 +1193,35 @@ function deleteDream() {
 // ══════════════════════════════════════════════════════════
 //  EDITOR HELPERS
 // ══════════════════════════════════════════════════════════
+// ── IMAGE COMPRESSION ──────────────────────────────────────
+// Resizes to maxW×maxH and compresses to JPEG quality q (0–1).
+// Returns a base64 data URL.
+function compressImage(dataUrl, maxW, maxH, q) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      const ratio = Math.min(maxW / w, maxH / h, 1);
+      w = Math.round(w * ratio); h = Math.round(h * ratio);
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(cv.toDataURL('image/jpeg', q));
+    };
+    img.src = dataUrl;
+  });
+}
+
 function triggerEditorCover() { document.getElementById('editor-cover-input').click(); }
-function setEditorCover(e) {
+async function setEditorCover(e) {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
-    currentDream.cover = ev.target.result;
+  reader.onload = async ev => {
+    // Cover: max 1200×500, 70% quality (~100–200 KB)
+    const compressed = await compressImage(ev.target.result, 1200, 500, 0.7);
+    currentDream.cover = compressed;
     const img = document.getElementById('editor-cover-img');
-    img.src = ev.target.result; img.style.display = 'block';
+    img.src = compressed; img.style.display = 'block';
     document.getElementById('editor-cover-hint').style.display = 'none';
   };
   reader.readAsDataURL(file);
@@ -1204,7 +1281,11 @@ function triggerCharPhoto(i) { document.getElementById('char-photo-'+i)?.click()
 function setCharPhoto(e,i) {
   const file=e.target.files[0]; if(!file)return;
   const reader=new FileReader();
-  reader.onload=ev=>{currentDream.chars[i].photo=ev.target.result;renderChars()};
+  reader.onload=async ev=>{
+    // Avatar: max 200×200, 75% quality (~10–20 KB)
+    currentDream.chars[i].photo = await compressImage(ev.target.result, 200, 200, 0.75);
+    renderChars();
+  };
   reader.readAsDataURL(file);
 }
 function renderPhotos() {
@@ -1218,9 +1299,15 @@ function renderPhotos() {
 }
 function triggerPhotoUpload() { document.getElementById('photo-input').click(); }
 function addPhotos(e) {
-  Array.from(e.target.files).forEach(file => {
-    const reader=new FileReader();
-    reader.onload=ev=>{if(!currentDream.photos)currentDream.photos=[];currentDream.photos.push(ev.target.result);renderPhotos()};
+  Array.from(e.target.files).forEach(async file => {
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      // Gallery photo: max 1200×900, 72% quality (~150–250 KB)
+      const compressed = await compressImage(ev.target.result, 1200, 900, 0.72);
+      if (!currentDream.photos) currentDream.photos = [];
+      currentDream.photos.push(compressed);
+      renderPhotos();
+    };
     reader.readAsDataURL(file);
   });
   e.target.value='';
