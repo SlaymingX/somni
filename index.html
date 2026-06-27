@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0D0B1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Сонна Книга</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── TOKENS ─────────────────────────────── */
+:root {
+  --bg-deep:    #0D0B1A;
+  --bg-card:    #151228;
+  --bg-panel:   #1E1A35;
+  --bg-input:   #221E3A;
+  --border:     rgba(196,181,232,0.12);
+  --border-act: rgba(196,181,232,0.35);
+
+  --lavender:   #C4B5E8;
+  --lavender-dim:#8B7DB8;
+  --gold:       #D4A853;
+  --gold-dim:   #9A7A3A;
+  --cream:      #F0EBD8;
+  --mist:       #6B8CC7;
+  --mist-dim:   #3D5490;
+
+  --text-primary: #EDE8F5;
+  --text-secondary: #A89EC4;
+  --text-muted:   #665F88;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-ui:      'Inter', system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-card: 0 4px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(196,181,232,0.06);
+  --shadow-glow: 0 0 40px rgba(107,140,199,0.15);
+
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── RESET ──────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+input, textarea, select, button { font-family: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ── SCROLLBAR ──────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-panel); border-radius: 2px; }
+
+/* ── STARFIELD ──────────────────────────── */
+#starfield {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: 0.6;
+}
+
+/* ── APP SHELL ──────────────────────────── */
+#app {
+  position: relative; z-index: 1;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+
+/* ── VIEWS ──────────────────────────────── */
+.view { display: none; flex-direction: column; flex: 1; }
+.view.active { display: flex; }
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+#home-view {
+  padding-bottom: 80px;
+}
+
+/* Cover */
+.cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/7;
+  min-height: 220px;
+  max-height: 380px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.cover-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.cover:hover .cover-img { transform: scale(1.03); }
+.cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13,11,26,0) 0%,
+    rgba(13,11,26,0.3) 50%,
+    rgba(13,11,26,0.95) 100%
+  );
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+}
+.cover-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-style: italic;
+  color: var(--cream);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+}
+.cover-subtitle {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--lavender-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.cover-change-btn {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(13,11,26,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--lavender);
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.cover:hover .cover-change-btn { opacity: 1; }
+
+/* Home Header */
+.home-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 8px;
+}
+.home-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--cream);
+}
+.home-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Controls bar */
+.controls-bar {
+  display: flex; gap: 8px;
+  padding: 8px 20px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.controls-bar::-webkit-scrollbar { display: none; }
+
+.btn-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.btn-chip:hover, .btn-chip.active {
+  background: var(--bg-input);
+  border-color: var(--border-act);
+  color: var(--lavender);
+}
+.btn-chip svg { width: 14px; height: 14px; }
+
+/* Search bar */
+.search-wrap {
+  padding: 0 20px 12px;
+}
+.search-input {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  padding: 10px 14px 10px 38px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition);
+  position: relative;
+}
+.search-input:focus { border-color: var(--border-act); }
+.search-wrap { position: relative; padding: 0 20px 12px; }
+.search-wrap::before {
+  content: '';
+  position: absolute;
+  left: 33px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23665F88' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+}
+
+/* Sections */
+.section-label {
+  padding: 4px 20px 10px;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Dream Grid */
+.dream-grid {
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 480px) { .dream-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 768px) { .dream-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.dream-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  box-shadow: var(--shadow-card);
+}
+.dream-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+  border-color: var(--border-act);
+}
+.dream-card:active { transform: translateY(-1px); }
+
+.card-thumb {
+  aspect-ratio: 4/3;
+  background: var(--bg-panel);
+  overflow: hidden;
+  position: relative;
+}
+.card-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.dream-card:hover .card-thumb img { transform: scale(1.08); }
+.card-thumb-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.card-mood-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.card-body { padding: 10px 12px 12px; }
+.card-emoji { font-size: 1rem; margin-bottom: 4px; }
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--cream);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin-top: 7px;
+}
+.tag-pill {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: rgba(107,140,199,0.15);
+  color: var(--mist);
+  border: 1px solid rgba(107,140,199,0.2);
+}
+
+/* FAB */
+.fab {
+  position: fixed; bottom: 90px; right: 20px; z-index: 50;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--lavender), var(--mist));
+  border: none;
+  color: var(--bg-deep);
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(107,140,199,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(107,140,199,0.6);
+}
+.fab:active { transform: scale(0.96); }
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: flex;
+  background: rgba(13,11,26,0.92);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.nav-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  padding: 10px 0 12px;
+  background: none; border: none;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-btn.active { color: var(--lavender); }
+.nav-btn:hover { color: var(--text-secondary); }
+
+/* ══════════════════════════════════════════
+   DREAM EDITOR
+══════════════════════════════════════════ */
+#editor-view {
+  padding-bottom: 80px;
+  flex: 1;
+}
+
+.editor-topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(13,11,26,0.92);
+  backdrop-filter: blur(20px);
+}
+.topbar-back {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.topbar-back:hover { border-color: var(--border-act); color: var(--lavender); }
+.topbar-title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--cream);
+}
+.topbar-actions { display: flex; gap: 8px; }
+.btn-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--bg-panel); color: var(--lavender); border-color: var(--border-act); }
+.btn-icon svg { width: 16px; height: 16px; }
+.btn-save {
+  padding: 0 16px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--lavender-dim), var(--mist-dim));
+  border: none;
+  color: var(--cream);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.btn-save:hover { opacity: 0.85; }
+
+.editor-content { padding: 20px; }
+
+/* Cover photo in editor */
+.editor-cover {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  aspect-ratio: 16/6;
+  background: var(--bg-panel);
+  border: 2px dashed var(--border);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--transition);
+}
+.editor-cover:hover { border-color: var(--border-act); }
+.editor-cover img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.editor-cover-hint {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+.editor-cover-hint svg { width: 28px; height: 28px; opacity: 0.5; }
+.editor-cover-overlay {
+  position: absolute; inset: 0;
+  background: rgba(13,11,26,0.6);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.editor-cover:hover .editor-cover-overlay { opacity: 1; }
+.editor-cover-overlay span {
+  background: rgba(196,181,232,0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-act);
+  border-radius: var(--radius-sm);
+  color: var(--lavender);
+  padding: 8px 16px;
+  font-size: 0.8rem;
+}
+
+/* Emoji + Title row */
+.editor-title-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 16px;
+}
+.emoji-btn {
+  width: 48px; height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  margin-top: 2px;
+}
+.emoji-btn:hover { border-color: var(--border-act); background: var(--bg-input); }
+.title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--cream);
+  outline: none;
+  resize: none;
+  line-height: 1.25;
+  min-height: 48px;
+}
+.title-input::placeholder { color: var(--text-muted); }
+
+/* Meta row */
+.meta-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.meta-field {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.meta-field:hover { border-color: var(--border-act); color: var(--lavender); }
+.meta-field svg { width: 13px; height: 13px; opacity: 0.7; }
+.meta-field input, .meta-field select {
+  background: none; border: none; color: inherit;
+  font-size: inherit; outline: none; cursor: pointer;
+  min-width: 80px;
+}
+.meta-field input[type="date"] { min-width: 120px; }
+
+/* Mood selector */
+.mood-row {
+  margin-bottom: 16px;
+}
+.mood-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.mood-options {
+  display: flex; gap: 8px;
+}
+.mood-opt {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.mood-opt:hover { border-color: var(--border-act); }
+.mood-opt.selected { border-color: currentColor; background: var(--bg-input); }
+.mood-opt span:first-child { font-size: 1.1rem; }
+.mood-vivid { color: var(--gold); }
+.mood-peaceful { color: #6BC7A8; }
+.mood-scary { color: #C76B6B; }
+.mood-strange { color: var(--lavender); }
+.mood-sad { color: #6B9CC7; }
+.mood-joyful { color: #C7B26B; }
+
+/* Tags section */
+.section-divider {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin: 16px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.tags-input-wrap {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  transition: border-color var(--transition);
+  min-height: 44px;
+  cursor: text;
+}
+.tags-input-wrap:focus-within { border-color: var(--border-act); }
+.tag-item {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(107,140,199,0.15);
+  border: 1px solid rgba(107,140,199,0.25);
+  border-radius: 20px;
+  color: var(--mist);
+  padding: 3px 10px 3px 10px;
+  font-size: 0.78rem;
+}
+.tag-remove {
+  cursor: pointer; opacity: 0.6;
+  background: none; border: none; color: inherit;
+  line-height: 1;
+  padding: 0 0 0 2px;
+  font-size: 0.9rem;
+}
+.tag-remove:hover { opacity: 1; }
+.tag-text-input {
+  border: none; background: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 80px;
+  flex: 1;
+}
+.tag-text-input::placeholder { color: var(--text-muted); }
+
+/* Characters */
+.chars-list { display: flex; flex-direction: column; gap: 8px; }
+.char-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+.char-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+.char-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-info { flex: 1; }
+.char-name-input {
+  background: none; border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+}
+.char-role-input {
+  background: none; border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  outline: none;
+  width: 100%;
+  margin-top: 2px;
+}
+.char-name-input::placeholder, .char-role-input::placeholder { color: var(--text-muted); opacity: 0.5; }
+.char-delete {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.char-delete:hover { border-color: rgba(199,107,107,0.4); color: #C76B6B; background: rgba(199,107,107,0.08); }
+.char-delete svg { width: 14px; height: 14px; }
+
+.btn-add {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+  transition: all var(--transition);
+}
+.btn-add:hover { border-color: var(--border-act); color: var(--lavender); }
+.btn-add svg { width: 14px; height: 14px; }
+
+/* Photos grid */
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.photo-item {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.photo-delete {
+  position: absolute; top: 4px; right: 4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(13,11,26,0.8);
+  border: none;
+  color: #fff;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.photo-item:hover .photo-delete { opacity: 1; }
+.photo-add-btn {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+  background: var(--bg-panel);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-muted);
+  font-size: 1.4rem;
+}
+.photo-add-btn:hover { border-color: var(--border-act); color: var(--lavender); }
+
+/* Main text editor */
+.dream-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  padding: 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.dream-textarea:focus { border-color: var(--border-act); }
+.dream-textarea::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* ══════════════════════════════════════════
+   STATS VIEW
+══════════════════════════════════════════ */
+#stats-view {
+  padding: 0 0 80px;
+}
+.stats-header {
+  padding: 20px 20px 8px;
+}
+.stats-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--cream);
+  margin-bottom: 4px;
+}
+.stats-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 16px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--lavender);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.stat-card.wide {
+  grid-column: 1 / -1;
+}
+.mood-bars {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 10px;
+}
+.mood-bar-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.mood-bar-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  min-width: 70px;
+}
+.mood-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mood-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.mood-bar-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  min-width: 20px;
+  text-align: right;
+}
+
+/* Tag cloud */
+.tag-cloud {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 12px 16px;
+}
+.tag-cloud-item {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(107,140,199,0.12);
+  border: 1px solid rgba(107,140,199,0.2);
+  color: var(--mist);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.tag-cloud-item:hover {
+  background: rgba(107,140,199,0.22);
+  border-color: rgba(107,140,199,0.4);
+}
+.tag-cloud-item.large { font-size: 1rem; padding: 8px 18px; }
+.tag-cloud-item.small { font-size: 0.7rem; padding: 4px 10px; opacity: 0.7; }
+
+/* ══════════════════════════════════════════
+   SETTINGS VIEW
+══════════════════════════════════════════ */
+#settings-view {
+  padding: 0 0 80px;
+}
+.settings-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.settings-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--cream);
+}
+.settings-group {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-group-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0 20px 10px;
+}
+.settings-row {
+  display: flex; align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.settings-row:hover { background: rgba(196,181,232,0.03); }
+.settings-row-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 12px;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.settings-row-text { flex: 1; }
+.settings-row-title {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.settings-row-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.settings-row-end {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.toggle {
+  position: relative;
+  width: 40px; height: 22px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  left: 2px; top: 50%; transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all var(--transition);
+}
+.toggle input:checked + .toggle-slider { background: var(--lavender-dim); border-color: var(--lavender); }
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(18px) translateY(-50%);
+  background: var(--cream);
+}
+
+/* ══════════════════════════════════════════
+   EMOJI PICKER
+══════════════════════════════════════════ */
+.emoji-picker {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(13,11,26,0.8);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+.emoji-panel {
+  width: 100%;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 16px 16px 40px;
+  animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.emoji-panel-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+.emoji-option {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.emoji-option:hover { background: var(--bg-panel); }
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-act);
+  border-radius: var(--radius-md);
+  color: var(--lavender);
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  z-index: 300;
+  animation: toastIn 0.3s ease forwards;
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   DELETE CONFIRM DIALOG
+══════════════════════════════════════════ */
+.dialog-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(13,11,26,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: var(--shadow-card);
+  animation: scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+.dialog-body {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.dialog-actions {
+  display: flex; gap: 8px;
+}
+.dialog-btn {
+  flex: 1; padding: 10px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.dialog-btn-cancel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.dialog-btn-cancel:hover { border-color: var(--border-act); color: var(--text-primary); }
+.dialog-btn-delete {
+  background: rgba(199,107,107,0.15);
+  border: 1px solid rgba(199,107,107,0.3);
+  color: #C76B6B;
+}
+.dialog-btn-delete:hover { background: rgba(199,107,107,0.25); }
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 20px;
+  text-align: center;
+  gap: 12px;
+}
+.empty-state-icon { font-size: 3rem; opacity: 0.4; }
+.empty-state-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.empty-state-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+.empty-state-btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(196,181,232,0.2), rgba(107,140,199,0.2));
+  border: 1px solid var(--border-act);
+  color: var(--lavender);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.empty-state-btn:hover { background: linear-gradient(135deg, rgba(196,181,232,0.3), rgba(107,140,199,0.3)); }
+
+/* Sort popover */
+.sort-menu {
+  position: fixed; z-index: 150;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  box-shadow: var(--shadow-card);
+  min-width: 180px;
+  animation: scaleIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  transform-origin: top right;
+}
+.sort-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.sort-item:hover { background: var(--bg-panel); color: var(--lavender); }
+.sort-item.active { color: var(--lavender); }
+.sort-item svg { width: 14px; height: 14px; opacity: 0.7; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div id="app">
+
+  <!-- ═══ HOME ═══ -->
+  <div id="home-view" class="view active">
+
+    <!-- Cover image -->
+    <div class="cover" id="home-cover">
+      <div id="cover-placeholder" class="cover-thumb-placeholder" style="
+        width:100%;height:100%;
+        background: linear-gradient(135deg,#1A1530 0%,#0D1A2E 50%,#1A0D2E 100%);
+        display:flex;align-items:center;justify-content:center;
+        font-size:4rem;letter-spacing:0.2em;
+      ">🌙✨</div>
+      <img id="cover-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;" src="" alt="">
+      <div class="cover-overlay">
+        <div class="cover-title" id="cover-title-text">Сонна Книга</div>
+        <div class="cover-subtitle">щоденник снів</div>
+      </div>
+      <button class="cover-change-btn" onclick="triggerCoverUpload()">📷 Обкладинка</button>
+    </div>
+    <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="setCoverImage(event)">
+
+    <div class="home-header">
+      <div class="home-title">Записи</div>
+      <div class="home-count" id="entry-count">0 снів</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-bar">
+      <button class="btn-chip active" id="sort-btn" onclick="toggleSortMenu(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+        <span id="sort-label">Новіші</span>
+      </button>
+      <button class="btn-chip" id="filter-vivid" onclick="toggleMoodFilter('vivid')">🌟 Яскраві</button>
+      <button class="btn-chip" id="filter-scary" onclick="toggleMoodFilter('scary')">😱 Тривожні</button>
+      <button class="btn-chip" id="filter-peaceful" onclick="toggleMoodFilter('peaceful')">🌿 Спокійні</button>
+      <button class="btn-chip" id="filter-strange" onclick="toggleMoodFilter('strange')">🌀 Дивні</button>
+      <button class="btn-chip" id="filter-joyful" onclick="toggleMoodFilter('joyful')">✨ Радісні</button>
+    </div>
+
+    <!-- Sort menu -->
+    <div class="sort-menu hidden" id="sort-menu">
+      <div class="sort-item active" onclick="setSort('newest')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h13M3 8h9M3 12h5m8 0 4-4-4-4"/></svg>
+        Новіші спочатку
+      </div>
+      <div class="sort-item" onclick="setSort('oldest')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h13M3 8h9M3 12h5m8 4 4 4-4 4"/></svg>
+        Старіші спочатку
+      </div>
+      <div class="sort-item" onclick="setSort('alpha')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 15 4-8 4 8M5 11h4M17 8v8m-2-2 2 2 2-2"/></svg>
+        За алфавітом
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <input type="search" class="search-input" placeholder="Шукати сни…" id="search-input" oninput="renderCards()">
+    </div>
+
+    <div class="section-label" id="year-label">2026 · <span id="year-count">0</span></div>
+
+    <!-- Dream Cards -->
+    <div class="dream-grid" id="dream-grid"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state hidden" id="empty-state">
+      <div class="empty-state-icon">🌙</div>
+      <div class="empty-state-title">Ще немає записів</div>
+      <div class="empty-state-text">Записуй свої сни одразу після пробудження,<br>поки вони ще свіжі у пам'яті.</div>
+      <button class="empty-state-btn" onclick="newDream()">+ Перший запис</button>
+    </div>
+  </div>
+
+  <!-- ═══ EDITOR ═══ -->
+  <div id="editor-view" class="view">
+    <div class="editor-topbar">
+      <button class="topbar-back" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="topbar-title" id="editor-topbar-title">Новий сон</div>
+      <div class="topbar-actions">
+        <button class="btn-icon" onclick="confirmDelete()" title="Видалити" id="delete-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        </button>
+        <button class="btn-save" onclick="saveDream()">Зберегти</button>
+      </div>
+    </div>
+
+    <div class="editor-content">
+      <!-- Photo cover -->
+      <div class="editor-cover" id="editor-cover" onclick="triggerEditorCover()">
+        <div class="editor-cover-hint" id="editor-cover-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          Додати обкладинку
+        </div>
+        <img id="editor-cover-img" src="" alt="" style="display:none">
+        <div class="editor-cover-overlay"><span>Змінити фото</span></div>
+      </div>
+      <input type="file" id="editor-cover-input" accept="image/*" style="display:none" onchange="setEditorCover(event)">
+
+      <!-- Emoji + Title -->
+      <div class="editor-title-row">
+        <button class="emoji-btn" id="emoji-btn" onclick="openEmojiPicker()">🌙</button>
+        <textarea class="title-input" id="title-input" placeholder="Назва сну…" rows="2"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      </div>
+
+      <!-- Meta -->
+      <div class="meta-row">
+        <div class="meta-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <input type="date" id="dream-date" value="">
+        </div>
+        <div class="meta-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <input type="time" id="dream-time" value="">
+        </div>
+        <div class="meta-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <input type="text" id="dream-place" placeholder="Місце…" style="min-width:80px">
+        </div>
+      </div>
+
+      <!-- Mood -->
+      <div class="mood-row">
+        <div class="mood-label">Відчуття сну</div>
+        <div class="mood-options">
+          <button class="mood-opt mood-vivid" data-mood="vivid" onclick="selectMood('vivid')"><span>🌟</span><span>Яскравий</span></button>
+          <button class="mood-opt mood-peaceful" data-mood="peaceful" onclick="selectMood('peaceful')"><span>🌿</span><span>Спокійний</span></button>
+          <button class="mood-opt mood-scary" data-mood="scary" onclick="selectMood('scary')"><span>😱</span><span>Тривожний</span></button>
+          <button class="mood-opt mood-strange" data-mood="strange" onclick="selectMood('strange')"><span>🌀</span><span>Дивний</span></button>
+          <button class="mood-opt mood-joyful" data-mood="joyful" onclick="selectMood('joyful')"><span>✨</span><span>Радісний</span></button>
+          <button class="mood-opt mood-sad" data-mood="sad" onclick="selectMood('sad')"><span>🌧</span><span>Сумний</span></button>
+        </div>
+      </div>
+
+      <!-- Dream text -->
+      <div class="section-divider">Розповідь сну</div>
+      <textarea class="dream-textarea" id="dream-text"
+        placeholder="Опиши свій сон… що бачив, що відчував, що відбувалось…"
+        rows="8"></textarea>
+
+      <!-- Tags -->
+      <div class="section-divider">Теги</div>
+      <div class="tags-input-wrap" id="tags-wrap" onclick="document.getElementById('tag-input').focus()">
+        <input type="text" id="tag-input" class="tag-text-input" placeholder="Додати тег…"
+          onkeydown="handleTagInput(event)">
+      </div>
+
+      <!-- Characters -->
+      <div class="section-divider">Персонажі</div>
+      <div class="chars-list" id="chars-list"></div>
+      <button class="btn-add" onclick="addCharacter()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Додати персонажа
+      </button>
+
+      <!-- Photos -->
+      <div class="section-divider">Фото & Ілюстрації</div>
+      <div class="photos-grid" id="photos-grid">
+        <button class="photo-add-btn" onclick="triggerPhotoUpload()">+</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhotos(event)">
+    </div>
+  </div>
+
+  <!-- ═══ STATS ═══ -->
+  <div id="stats-view" class="view">
+    <div class="stats-header">
+      <div class="stats-title">Статистика</div>
+      <div class="stats-subtitle">Аналіз твоїх снів</div>
+    </div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="section-label" style="padding:12px 16px 4px">Найчастіші теги</div>
+    <div class="tag-cloud" id="tag-cloud"></div>
+    <div class="section-label" style="padding:8px 16px 4px">Настрої снів</div>
+    <div style="padding:0 16px 16px">
+      <div class="stat-card">
+        <div class="mood-bars" id="mood-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <div id="settings-view" class="view">
+    <div class="settings-header">
+      <div class="settings-title">Налаштування</div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-group-label">Профіль</div>
+      <div class="settings-row">
+        <div class="settings-row-icon">👤</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title" id="settings-name-display">Твоє ім'я</div>
+          <div class="settings-row-sub">Ім'я в щоденнику</div>
+        </div>
+        <div class="settings-row-end" onclick="editName()">✏️</div>
+      </div>
+      <div class="settings-row" onclick="triggerCoverUpload()">
+        <div class="settings-row-icon">🖼</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Обкладинка</div>
+          <div class="settings-row-sub">Головне фото щоденника</div>
+        </div>
+        <div class="settings-row-end">›</div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-group-label">Нагадування</div>
+      <div class="settings-row">
+        <div class="settings-row-icon">🔔</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Нагадування вранці</div>
+          <div class="settings-row-sub">Нагадай записати сон</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="reminder-toggle" onchange="saveSettings()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-icon">⏰</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Час нагадування</div>
+          <div class="settings-row-sub">Коли прокидаєшся</div>
+        </div>
+        <input type="time" id="reminder-time" value="08:00" onchange="saveSettings()"
+          style="background:none;border:none;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;outline:none;">
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-group-label">Дані</div>
+      <div class="settings-row" onclick="exportData()">
+        <div class="settings-row-icon">📤</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Експорт JSON</div>
+          <div class="settings-row-sub">Зберегти всі записи</div>
+        </div>
+        <div class="settings-row-end">›</div>
+      </div>
+      <div class="settings-row" onclick="importData()">
+        <div class="settings-row-icon">📥</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Імпорт</div>
+          <div class="settings-row-sub">Завантажити записи</div>
+        </div>
+        <div class="settings-row-end">›</div>
+      </div>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="doImport(event)">
+    </div>
+    <div style="padding:24px 20px;text-align:center;">
+      <div style="font-size:0.75rem;color:var(--text-muted)">Сонна Книга · v1.0</div>
+      <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px">Всі дані зберігаються локально</div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showView('home')" id="nav-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Сни
+    </button>
+    <button class="nav-btn" onclick="showView('stats')" id="nav-stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Аналіз
+    </button>
+    <button class="nav-btn" onclick="showView('settings')" id="nav-settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Більше
+    </button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" onclick="newDream()" id="fab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+</div>
+
+<!-- Emoji picker -->
+<div class="emoji-picker hidden" id="emoji-picker" onclick="closeEmojiPicker(event)">
+  <div class="emoji-panel">
+    <div class="emoji-panel-title">Виберіть емодзі</div>
+    <div class="emoji-grid" id="emoji-grid"></div>
+  </div>
+</div>
+
+<!-- Dialog -->
+<div class="dialog-overlay hidden" id="dialog-overlay">
+  <div class="dialog">
+    <div class="dialog-title">Видалити сон?</div>
+    <div class="dialog-body">Цей запис буде видалено назавжди. Відновити неможливо.</div>
+    <div class="dialog-actions">
+      <button class="dialog-btn dialog-btn-cancel" onclick="closeDialog()">Скасувати</button>
+      <button class="dialog-btn dialog-btn-delete" onclick="deleteDream()">Видалити</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  STARFIELD
+// ══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  function init() {
+    resize();
+    stars = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2,
+      o: Math.random() * 0.7 + 0.1,
+      s: Math.random() * 0.003 + 0.001,
+      p: Math.random() * Math.PI * 2
+    }));
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const t = Date.now() / 1000;
+    stars.forEach(s => {
+      const opacity = s.o * (0.6 + 0.4 * Math.sin(t * s.s * 50 + s.p));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(196,181,232,${opacity})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', () => { resize(); init(); });
+  init(); draw();
+})();
+
+// ══════════════════════════════════════════
+//  STATE & STORAGE
+// ══════════════════════════════════════════
+let dreams = JSON.parse(localStorage.getItem('dreams') || '[]');
+let settings = JSON.parse(localStorage.getItem('dreamSettings') || '{}');
+let coverImage = localStorage.getItem('dreamCover') || '';
+let currentDream = null;
+let currentSort = 'newest';
+let moodFilter = null;
+
+const EMOJIS = ['🌙','⭐','✨','🌟','💫','🌌','🌠','🌃','🌉','🌁','🌊','🌀','🌈','⚡','🔥','❄️','🍃','🌿','🌺','🌸','🦋','🦅','🐉','🦄','🐺','🦊','🐬','🦁','👁️','🗝️','🚪','🏛️','🌊','🏔️','🏜️','🌲','💎','⚔️','🛡️','📖','🎭','🎪','🎠','🚂','✈️','🚀','🎸','🎹','🎺','🎶','🧿','☯️','🔮','🪄','💜','💙','🤍','🖤','❤️‍🔥'];
+const MOOD_COLORS = { vivid:'#D4A853', peaceful:'#6BC7A8', scary:'#C76B6B', strange:'#C4B5E8', joyful:'#C7B26B', sad:'#6B9CC7' };
+const MOOD_LABELS = { vivid:'Яскравий', peaceful:'Спокійний', scary:'Тривожний', strange:'Дивний', joyful:'Радісний', sad:'Сумний' };
+const MOOD_EMOJIS = { vivid:'🌟', peaceful:'🌿', scary:'😱', strange:'🌀', joyful:'✨', sad:'🌧' };
+
+function save() {
+  localStorage.setItem('dreams', JSON.stringify(dreams));
+}
+
+// ══════════════════════════════════════════
+//  VIEWS
+// ══════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(name + '-view').classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+  const fab = document.getElementById('fab');
+  fab.style.display = name === 'home' ? 'flex' : 'none';
+
+  if (name === 'home') renderCards();
+  if (name === 'stats') renderStats();
+  if (name === 'settings') renderSettings();
+}
+
+function goBack() {
+  showView('home');
+}
+
+// ══════════════════════════════════════════
+//  COVER
+// ══════════════════════════════════════════
+function triggerCoverUpload() {
+  document.getElementById('cover-file-input').click();
+}
+function setCoverImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    coverImage = ev.target.result;
+    localStorage.setItem('dreamCover', coverImage);
+    const img = document.getElementById('cover-img');
+    img.src = coverImage;
+    img.style.display = 'block';
+    document.getElementById('cover-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+function initCover() {
+  if (coverImage) {
+    const img = document.getElementById('cover-img');
+    img.src = coverImage;
+    img.style.display = 'block';
+    document.getElementById('cover-placeholder').style.display = 'none';
+  }
+  const name = settings.name || '';
+  if (name) document.getElementById('cover-title-text').textContent = name + "'s Сонна Книга";
+}
+
+// ══════════════════════════════════════════
+//  SORT & FILTER
+// ══════════════════════════════════════════
+function toggleSortMenu(e) {
+  e.stopPropagation();
+  const m = document.getElementById('sort-menu');
+  const btn = document.getElementById('sort-btn');
+  if (m.classList.contains('hidden')) {
+    m.classList.remove('hidden');
+    const r = btn.getBoundingClientRect();
+    m.style.top = (r.bottom + 6) + 'px';
+    m.style.right = '12px';
+    setTimeout(() => document.addEventListener('click', closeSortMenu, { once: true }), 10);
+  } else {
+    m.classList.add('hidden');
+  }
+}
+function closeSortMenu() { document.getElementById('sort-menu').classList.add('hidden'); }
+function setSort(type) {
+  currentSort = type;
+  const labels = { newest:'Новіші', oldest:'Старіші', alpha:'А–Я' };
+  document.getElementById('sort-label').textContent = labels[type];
+  document.querySelectorAll('.sort-item').forEach(i => i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  closeSortMenu();
+  renderCards();
+}
+function toggleMoodFilter(mood) {
+  moodFilter = moodFilter === mood ? null : mood;
+  document.querySelectorAll('[id^="filter-"]').forEach(b => b.classList.remove('active'));
+  if (moodFilter) document.getElementById('filter-' + moodFilter)?.classList.add('active');
+  renderCards();
+}
+
+// ══════════════════════════════════════════
+//  RENDER HOME
+// ══════════════════════════════════════════
+function renderCards() {
+  const grid = document.getElementById('dream-grid');
+  const emptyState = document.getElementById('empty-state');
+  const search = document.getElementById('search-input').value.toLowerCase();
+
+  let list = [...dreams];
+  if (search) {
+    list = list.filter(d =>
+      d.title?.toLowerCase().includes(search) ||
+      d.text?.toLowerCase().includes(search) ||
+      d.tags?.some(t => t.toLowerCase().includes(search)) ||
+      d.chars?.some(c => c.name?.toLowerCase().includes(search))
+    );
+  }
+  if (moodFilter) list = list.filter(d => d.mood === moodFilter);
+
+  if (currentSort === 'newest') list.sort((a,b) => b.date.localeCompare(a.date));
+  else if (currentSort === 'oldest') list.sort((a,b) => a.date.localeCompare(b.date));
+  else if (currentSort === 'alpha') list.sort((a,b) => (a.title||'').localeCompare(b.title||'', 'uk'));
+
+  document.getElementById('entry-count').textContent = dreams.length + (dreams.length === 1 ? ' сон' : dreams.length < 5 ? ' сни' : ' снів');
+
+  const years = [...new Set(list.map(d => d.date?.slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+  const yearLabel = document.getElementById('year-label');
+  if (years.length > 0) {
+    yearLabel.innerHTML = years[0] + ' · <span id="year-count">' + list.filter(d=>d.date?.startsWith(years[0])).length + '</span>';
+  }
+
+  if (!list.length) {
+    grid.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  grid.innerHTML = list.map(d => {
+    const moodColor = MOOD_COLORS[d.mood] || 'transparent';
+    const thumb = d.cover || (d.photos && d.photos[0]) || '';
+    const firstTag = d.tags?.[0];
+    const dateStr = d.date ? new Date(d.date + 'T12:00').toLocaleDateString('uk-UA', { day:'numeric', month:'long' }) : '';
+    return `
+    <div class="dream-card" onclick="editDream('${d.id}')">
+      <div class="card-thumb">
+        ${thumb
+          ? `<img src="${thumb}" alt="" loading="lazy">`
+          : `<div class="card-thumb-placeholder">${d.emoji||'🌙'}</div>`
+        }
+        ${d.mood ? `<div class="card-mood-dot" style="background:${moodColor};color:${moodColor}"></div>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-emoji">${d.emoji||'🌙'}</div>
+        <div class="card-title">${d.title || 'Без назви'}</div>
+        <div class="card-date">${dateStr}</div>
+        ${d.tags?.length ? `<div class="card-tags">${d.tags.slice(0,2).map(t=>`<span class="tag-pill">#${t}</span>`).join('')}${d.tags.length>2?`<span class="tag-pill">+${d.tags.length-2}</span>`:''}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  NEW / EDIT DREAM
+// ══════════════════════════════════════════
+function newDream() {
+  currentDream = {
+    id: Date.now().toString(),
+    title: '',
+    emoji: '🌙',
+    date: new Date().toISOString().slice(0,10),
+    time: new Date().toTimeString().slice(0,5),
+    place: '',
+    mood: null,
+    text: '',
+    tags: [],
+    chars: [],
+    photos: [],
+    cover: null,
+    isNew: true
+  };
+  openEditor();
+}
+
+function editDream(id) {
+  const d = dreams.find(x => x.id === id);
+  if (!d) return;
+  currentDream = JSON.parse(JSON.stringify(d));
+  openEditor();
+}
+
+function openEditor() {
+  const d = currentDream;
+
+  document.getElementById('editor-topbar-title').textContent = d.isNew ? 'Новий сон' : d.title || 'Редагувати';
+  document.getElementById('title-input').value = d.title || '';
+  document.getElementById('emoji-btn').textContent = d.emoji || '🌙';
+  document.getElementById('dream-date').value = d.date || '';
+  document.getElementById('dream-time').value = d.time || '';
+  document.getElementById('dream-place').value = d.place || '';
+  document.getElementById('dream-text').value = d.text || '';
+  document.getElementById('delete-btn').style.display = d.isNew ? 'none' : 'flex';
+
+  // Cover
+  const coverImg = document.getElementById('editor-cover-img');
+  const coverHint = document.getElementById('editor-cover-hint');
+  if (d.cover) {
+    coverImg.src = d.cover;
+    coverImg.style.display = 'block';
+    coverHint.style.display = 'none';
+  } else {
+    coverImg.style.display = 'none';
+    coverHint.style.display = 'flex';
+  }
+
+  // Mood
+  document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
+  if (d.mood) document.querySelector(`[data-mood="${d.mood}"]`)?.classList.add('selected');
+
+  // Tags
+  renderTags();
+
+  // Characters
+  renderChars();
+
+  // Photos
+  renderPhotos();
+
+  showView('editor');
+  document.getElementById('nav-home').classList.remove('active');
+  setTimeout(() => document.getElementById('title-input').focus(), 100);
+}
+
+function saveDream() {
+  const d = currentDream;
+  d.title = document.getElementById('title-input').value.trim() || 'Без назви';
+  d.emoji = document.getElementById('emoji-btn').textContent;
+  d.date = document.getElementById('dream-date').value;
+  d.time = document.getElementById('dream-time').value;
+  d.place = document.getElementById('dream-place').value;
+  d.text = document.getElementById('dream-text').value;
+  d.isNew = false;
+
+  const idx = dreams.findIndex(x => x.id === d.id);
+  if (idx >= 0) dreams[idx] = d;
+  else dreams.unshift(d);
+  save();
+
+  showToast('💾 Збережено');
+  setTimeout(() => { showView('home'); }, 400);
+}
+
+// ══════════════════════════════════════════
+//  EDITOR COVER
+// ══════════════════════════════════════════
+function triggerEditorCover() { document.getElementById('editor-cover-input').click(); }
+function setEditorCover(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentDream.cover = ev.target.result;
+    const img = document.getElementById('editor-cover-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('editor-cover-hint').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
+//  MOOD
+// ══════════════════════════════════════════
+function selectMood(mood) {
+  if (currentDream.mood === mood) {
+    currentDream.mood = null;
+    document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
+  } else {
+    currentDream.mood = mood;
+    document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
+    document.querySelector(`[data-mood="${mood}"]`)?.classList.add('selected');
+  }
+}
+
+// ══════════════════════════════════════════
+//  TAGS
+// ══════════════════════════════════════════
+function renderTags() {
+  const wrap = document.getElementById('tags-wrap');
+  const input = document.getElementById('tag-input');
+  wrap.querySelectorAll('.tag-item').forEach(el => el.remove());
+  currentDream.tags.forEach((tag, i) => {
+    const el = document.createElement('span');
+    el.className = 'tag-item';
+    el.innerHTML = `#${tag}<button class="tag-remove" onclick="removeTag(${i})">×</button>`;
+    wrap.insertBefore(el, input);
+  });
+}
+function handleTagInput(e) {
+  const input = e.target;
+  if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+    e.preventDefault();
+    const tag = input.value.replace(/,/g,'').trim().toLowerCase();
+    if (tag && !currentDream.tags.includes(tag)) {
+      currentDream.tags.push(tag);
+      renderTags();
+    }
+    input.value = '';
+  } else if (e.key === 'Backspace' && !input.value && currentDream.tags.length) {
+    currentDream.tags.pop();
+    renderTags();
+  }
+}
+function removeTag(i) {
+  currentDream.tags.splice(i, 1);
+  renderTags();
+}
+
+// ══════════════════════════════════════════
+//  CHARACTERS
+// ══════════════════════════════════════════
+function renderChars() {
+  const list = document.getElementById('chars-list');
+  list.innerHTML = (currentDream.chars || []).map((c,i) => `
+    <div class="char-item">
+      <div class="char-avatar" onclick="triggerCharPhoto(${i})" id="char-avatar-${i}">
+        ${c.photo ? `<img src="${c.photo}" alt="">` : (c.emoji || '👤')}
+      </div>
+      <div class="char-info">
+        <input class="char-name-input" placeholder="Ім'я персонажа…" value="${c.name||''}"
+          oninput="currentDream.chars[${i}].name=this.value">
+        <input class="char-role-input" placeholder="Роль у сні…" value="${c.role||''}"
+          oninput="currentDream.chars[${i}].role=this.value">
+      </div>
+      <button class="char-delete" onclick="removeChar(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <input type="file" id="char-photo-${i}" accept="image/*" style="display:none"
+      onchange="setCharPhoto(event,${i})">
+  `).join('');
+}
+function addCharacter() {
+  if (!currentDream.chars) currentDream.chars = [];
+  currentDream.chars.push({ name:'', role:'', emoji:'👤', photo:null });
+  renderChars();
+}
+function removeChar(i) {
+  currentDream.chars.splice(i, 1);
+  renderChars();
+}
+function triggerCharPhoto(i) {
+  document.getElementById('char-photo-' + i)?.click();
+}
+function setCharPhoto(e, i) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentDream.chars[i].photo = ev.target.result;
+    renderChars();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
+//  PHOTOS
+// ══════════════════════════════════════════
+function renderPhotos() {
+  const grid = document.getElementById('photos-grid');
+  const photos = currentDream.photos || [];
+  grid.innerHTML = photos.map((p,i) => `
+    <div class="photo-item">
+      <img src="${p}" alt="">
+      <button class="photo-delete" onclick="removePhoto(${i})">✕</button>
+    </div>
+  `).join('') + `<button class="photo-add-btn" onclick="triggerPhotoUpload()">+</button>`;
+}
+function triggerPhotoUpload() { document.getElementById('photo-input').click(); }
+function addPhotos(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      if (!currentDream.photos) currentDream.photos = [];
+      currentDream.photos.push(ev.target.result);
+      renderPhotos();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+function removePhoto(i) {
+  currentDream.photos.splice(i, 1);
+  renderPhotos();
+}
+
+// ══════════════════════════════════════════
+//  EMOJI PICKER
+// ══════════════════════════════════════════
+function openEmojiPicker() {
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = EMOJIS.map(e =>
+    `<div class="emoji-option" onclick="selectEmoji('${e}')">${e}</div>`
+  ).join('');
+  document.getElementById('emoji-picker').classList.remove('hidden');
+}
+function closeEmojiPicker(e) {
+  if (e.target === document.getElementById('emoji-picker'))
+    document.getElementById('emoji-picker').classList.add('hidden');
+}
+function selectEmoji(emoji) {
+  document.getElementById('emoji-btn').textContent = emoji;
+  currentDream.emoji = emoji;
+  document.getElementById('emoji-picker').classList.add('hidden');
+}
+
+// ══════════════════════════════════════════
+//  DELETE
+// ══════════════════════════════════════════
+function confirmDelete() {
+  document.getElementById('dialog-overlay').classList.remove('hidden');
+}
+function closeDialog() {
+  document.getElementById('dialog-overlay').classList.add('hidden');
+}
+function deleteDream() {
+  dreams = dreams.filter(d => d.id !== currentDream.id);
+  save();
+  closeDialog();
+  showView('home');
+  showToast('🗑 Видалено');
+}
+
+// ══════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════
+function renderStats() {
+  const total = dreams.length;
+  const thisMonth = dreams.filter(d => d.date?.slice(0,7) === new Date().toISOString().slice(0,7)).length;
+  const withMood = dreams.filter(d => d.mood);
+  const allTags = dreams.flatMap(d => d.tags || []);
+  const uniqueTags = [...new Set(allTags)].length;
+  const moodCounts = {};
+  withMood.forEach(d => moodCounts[d.mood] = (moodCounts[d.mood]||0) + 1);
+  const topMood = Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${total}</div>
+      <div class="stat-label">Всього снів</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${thisMonth}</div>
+      <div class="stat-label">Цього місяця</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${uniqueTags}</div>
+      <div class="stat-label">Унікальних тегів</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${topMood ? (MOOD_EMOJIS[topMood[0]]||'?') : '—'}</div>
+      <div class="stat-label">${topMood ? 'Частіший настрій' : 'Немає даних'}</div>
+    </div>
+  `;
+
+  // Tag cloud
+  const tagFreq = {};
+  allTags.forEach(t => tagFreq[t] = (tagFreq[t]||0) + 1);
+  const sortedTags = Object.entries(tagFreq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  const maxFreq = sortedTags[0]?.[1] || 1;
+  document.getElementById('tag-cloud').innerHTML = sortedTags.map(([tag,count]) => {
+    const size = count/maxFreq;
+    const cls = size > 0.6 ? 'large' : size < 0.3 ? 'small' : '';
+    return `<span class="tag-cloud-item ${cls}" onclick="filterByTag('${tag}')">#${tag} <span style="opacity:0.5">${count}</span></span>`;
+  }).join('') || '<span style="color:var(--text-muted);font-size:0.85rem">Ще немає тегів</span>';
+
+  // Mood bars
+  const maxMood = Math.max(...Object.values(moodCounts), 1);
+  document.getElementById('mood-bars').innerHTML = Object.entries(MOOD_LABELS).map(([key, label]) => {
+    const count = moodCounts[key] || 0;
+    const pct = Math.round((count/maxMood)*100);
+    return `
+    <div class="mood-bar-row">
+      <div class="mood-bar-label">${MOOD_EMOJIS[key]} ${label}</div>
+      <div class="mood-bar-track">
+        <div class="mood-bar-fill" style="width:${pct}%;background:${MOOD_COLORS[key]}"></div>
+      </div>
+      <div class="mood-bar-count">${count}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterByTag(tag) {
+  moodFilter = null;
+  document.getElementById('search-input').value = tag;
+  showView('home');
+}
+
+// ══════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════
+function renderSettings() {
+  document.getElementById('settings-name-display').textContent = settings.name || 'Твоє ім\'я';
+  document.getElementById('reminder-toggle').checked = !!settings.reminder;
+  document.getElementById('reminder-time').value = settings.reminderTime || '08:00';
+}
+function saveSettings() {
+  settings.reminder = document.getElementById('reminder-toggle').checked;
+  settings.reminderTime = document.getElementById('reminder-time').value;
+  localStorage.setItem('dreamSettings', JSON.stringify(settings));
+  showToast('⚙️ Збережено');
+}
+function editName() {
+  const name = prompt('Твоє ім\'я:', settings.name || '');
+  if (name !== null) {
+    settings.name = name.trim();
+    localStorage.setItem('dreamSettings', JSON.stringify(settings));
+    renderSettings();
+    if (name.trim()) document.getElementById('cover-title-text').textContent = name.trim() + "'s Сонна Книга";
+    else document.getElementById('cover-title-text').textContent = 'Сонна Книга';
+  }
+}
+function exportData() {
+  const data = JSON.stringify({ dreams, settings }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sonnya-knyha-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('📤 Файл завантажено');
+}
+function importData() { document.getElementById('import-input').click(); }
+function doImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.dreams) {
+        dreams = data.dreams;
+        save();
+        if (data.settings) {
+          settings = data.settings;
+          localStorage.setItem('dreamSettings', JSON.stringify(settings));
+        }
+        showToast('📥 Імпортовано ' + dreams.length + ' снів');
+        renderCards();
+      }
+    } catch { showToast('⚠️ Помилка файлу'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function showToast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+// ══════════════════════════════════════════
+//  PWA
+// ══════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+initCover();
+renderCards();
+</script>
+</body>
+</html>
